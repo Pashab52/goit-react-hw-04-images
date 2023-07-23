@@ -1,23 +1,21 @@
-import {Component } from "react";
+import {useState } from "react";
 import PropTypes from 'prop-types';
 import Notiflix from 'notiflix';
 
 
-export class Searchbar extends Component {
-  static propTypes = {
-    handleOnSubmit: PropTypes.func.isRequired,
-  };
+export function Searchbar(props) {
+ 
+  const [searchValue, setSearchValue] = useState('');
+  
+    
 
-  state = {
-    searchValue: '',
-  };
 
-  handleOnChangeInput = event => {
-    this.setState({ searchValue: event.currentTarget.value });
+  const handleOnChangeInput = event => {
+     setSearchValue(event.currentTarget.value); 
   };
 
  
-  handleOnSubmit = event => {
+  const handleOnSubmit = event => {
     event.preventDefault();
     if (
       this.props.prevSearchValue === this.state.searchValue &&
@@ -39,10 +37,10 @@ export class Searchbar extends Component {
     this.setState({ searchValue: '' });
   };
 
-  render() {
+
     return (
       <header className="searchbar">
-        <form className="form" onSubmit={this.handleOnSubmit}>
+        <form className="form" onSubmit={handleOnSubmit}>
           <button type="submit" className="button">
             <span className="button-label">Search</span>
           </button>
@@ -53,11 +51,14 @@ export class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            onChange={this.handleOnChangeInput}
-            value={this.state.searchValue}
+            onChange={handleOnChangeInput}
+            value={searchValue}
           />
         </form>
       </header>
     );
   }
-}
+
+ Searchbar.propTypes = {
+    handleOnSubmit: PropTypes.func.isRequired,
+  };
