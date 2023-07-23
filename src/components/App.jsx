@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Searchbar } from "./Searchbar/Searchbar";
 import { fetchImg } from "Service/image-service";
 import { ImageGallery } from "./ImageGallery/ImageGallery";
@@ -10,70 +10,100 @@ import '../Utils/Notify'
 
 
 
-export class App extends Component {
-  state = {
-    searchValue: '',
-    imagesData: null,
-    page: 1,
-    showBtnLoadMore: false,
-    showLoader: false,
-    showModal: false,
-    modalData:null
-  };
+export function App() {
+  
+  const [searchValue, setSearchValue] = useState('');
+  const [imagesData, setImagesData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [showBtnLoadMore, setShowBtnLoadMore] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState(null);
 
-  async componentDidUpdate(prevProps, prevState) {
- 
-    if (
-      prevState.searchValue !== this.state.searchValue ||
-      // this.state.searchValue !== ''
-      prevState.page !== this.state.page
-    ) {
+const firstRender = useRef(true);
 
-      const imagesData = await fetchImg(
-        this.state.searchValue,
-        this.state.page
-      );
-      const normImageData = this.normlazizeImagesData(imagesData.hits);
-        
-      if (imagesData.totalHits !== 0 && this.state.page ===1) {
-          Notiflix.Notify.success(
-            `Hooray! We find ${imagesData.totalHits} images`
-          );
-        }
-
-      if (imagesData.totalHits === 0) {
-        Notiflix.Notify.failure('Sorry. There are no images ... 😭');
-      }
-      if (this.state.page === Math.ceil(imagesData.totalHits / 12)){
-        Notiflix.Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-      }
-      
-
-        this.setState(prevState => ({
-          imagesData: [...prevState.imagesData, ...normImageData],
-          showBtnLoadMore:
-            this.state.page < Math.ceil(imagesData.totalHits / 12),
-          showLoader: false,
-        }));
-      
-    }
+  useEffect(() => {
+    // if (
+    //   prevState.searchValue !== this.state.searchValue ||
+    //   // this.state.searchValue !== ''
+    //   prevState.page !== this.state.page
+    // ) {
     
-  }
+     if (firstRender.current) {
+       // console.log('рендер 1', contacts);
+       
+       return;
+     }
+    async function fetch() {
+       const imgData = await fetchImg(searchValue, page);
+       const normImageData = normlazizeImagesData(imgData.hits);
+   console.log(normImageData);
+      setImagesData(prevState => [...prevState, ...normImageData]);
+      //  setImagesData([...imagesData, ...normImageData]);
+       setShowBtnLoadMore(page < Math.ceil(imgData.totalHits / 12));
+       setShowLoader(false);
+    }
+     
+    fetch();
+
+    
+  },[page, searchValue, showLoader])
+    
+
+
+
+  // async componentDidUpdate(prevProps, prevState) {
+ 
+  //   if (
+  //     prevState.searchValue !== this.state.searchValue ||
+  //     // this.state.searchValue !== ''
+  //     prevState.page !== this.state.page
+  //   ) {
+
+  //     const imagesData = await fetchImg(
+  //       this.state.searchValue,
+  //       this.state.page
+  //     );
+  //     const normImageData = this.normlazizeImagesData(imagesData.hits);
+        
+  //     if (imagesData.totalHits !== 0 && this.state.page ===1) {
+  //         Notiflix.Notify.success(
+  //           `Hooray! We find ${imagesData.totalHits} images`
+  //         );
+  //       }
+
+  //     if (imagesData.totalHits === 0) {
+  //       Notiflix.Notify.failure('Sorry. There are no images ... 😭');
+  //     }
+  //     if (this.state.page === Math.ceil(imagesData.totalHits / 12)){
+  //       Notiflix.Notify.info(
+  //         "We're sorry, but you've reached the end of search results."
+  //       );
+  //     }
+      
+
+  //       this.setState(prevState => ({
+  //         imagesData: [...prevState.imagesData, ...normImageData],
+  //         showBtnLoadMore:
+  //           this.state.page < Math.ceil(imagesData.totalHits / 12),
+  //         showLoader: false,
+  //       }));
+  //   }
+  // }
 
   
 
-  handleOnSubmit = searchValue =>
-    this.setState({
-      searchValue,
-      imagesData: [],
-      page: 1,
-      showBtnLoadMore: false,
-      showLoader: true,
-    });
+  const handleOnSubmit = (sValue) => {
+    setSearchValue(sValue);
+    setImagesData([]);
+    setPage(1);
+    setShowBtnLoadMore(false);
+    setShowLoader(true);
+  }
 
-  normlazizeImagesData(imagesData) {
+
+
+   function normlazizeImagesData(imagesData) {
     return imagesData.map(({ id, webformatURL, largeImageURL, tags }) => ({
       id,
       webformatURL,
@@ -82,57 +112,57 @@ export class App extends Component {
     }));
   }
 
-  handleOnLoadMoreBtn = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-      showLoader: true,
-    }));
+  const handleOnLoadMoreBtn = () => {
+
+    setPage(prevState => prevState + 1);
+    setShowLoader(true)
+
   };
 
 
-  handleImageClick=(modalSrc, alt)=>{ 
-    this.setState({
-      modalData: { src: modalSrc, alt: alt },
-      showModal: true,
-    });
+ const handleImageClick=(modalSrc, alt)=>{ 
+ 
+   setModalData(modalSrc, alt);
+  //  {}
+  
+    setShowModal(true)
+   
   }
 
-  closeModal=()=> {
-   this.setState({ showModal: false})
+  const closeModal=()=> {
+   setShowModal(false)
   }
 
 
-  render() {
     return (
       <div>
-        <Searchbar handleOnSubmit={this.handleOnSubmit}
-        prevSearchValue= {this.state.searchValue}
+        <Searchbar handleOnSubmit={handleOnSubmit}
+        prevSearchValue= {searchValue}
         />
-        {this.state.imagesData && (
+        {imagesData && (
           <ImageGallery
-            images={this.state.imagesData}
-            onImgClick={this.handleImageClick}
+            images={imagesData}
+            onImgClick={handleImageClick}
           />
         )}
-        {this.state.showLoader && <Loader />}
+        {showLoader && <Loader />}
 
-        {this.state.showBtnLoadMore &&
-          this.state.imagesData.length > 0 &&
-          !this.state.showLoader && (
-            <Button onClick={this.handleOnLoadMoreBtn} />
+        {showBtnLoadMore &&
+          imagesData.length > 0 &&
+          !showLoader && (
+            <Button onClick={handleOnLoadMoreBtn} />
           )}
 
-        {this.state.showModal && (
-          <Modal onModalClose={this.closeModal}>
+        {showModal && (
+          <Modal onModalClose={closeModal}>
             <img
               className="modal"
-              src={this.state.modalData.src}
-              alt={this.state.modalData.alt}
+              src={modalData.src}
+              alt={modalData.alt}
             />
           </Modal>
         )}
       </div>
     );
-  }
 };
 
