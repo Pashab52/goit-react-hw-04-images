@@ -7,8 +7,6 @@ export function Searchbar(props) {
  
   const [searchValue, setSearchValue] = useState('');
   
-    
-
 
   const handleOnChangeInput = event => {
      setSearchValue(event.currentTarget.value); 
@@ -18,23 +16,23 @@ export function Searchbar(props) {
   const handleOnSubmit = event => {
     event.preventDefault();
     if (
-      this.props.prevSearchValue === this.state.searchValue &&
-      this.state.searchValue !== ''
+      props.prevSearchValue === searchValue &&
+      searchValue !== ''
     ) {
       Notiflix.Notify.info(
         'Нou already searched for this, please enter a different search word'
       );
     } else {
-      const searchValue = this.state.searchValue.trim();
-
+      
       if (searchValue === '') {
         Notiflix.Notify.info('Please fill out this field');
+      } else {
+        props.handleOnSubmit(searchValue.trim());
       }
-      if (searchValue !== '') {
-        this.props.handleOnSubmit(searchValue);
-      }
+        
+      
     }
-    this.setState({ searchValue: '' });
+    setSearchValue('');
   };
 
 
