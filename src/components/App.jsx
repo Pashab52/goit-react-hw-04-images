@@ -35,7 +35,7 @@ export function App() {
   
        const imgData = await fetchImg(searchValue, page);
        const normImageData = normlazizeImagesData(imgData.hits);
-      console.log(normImageData);
+      // console.log(normImageData);
 
       if (imgData.totalHits !== 0 && page === 1) {
         Notiflix.Notify.success(`Hooray! We find ${imgData.totalHits} images`);
