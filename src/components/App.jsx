@@ -29,7 +29,7 @@ export function App() {
       return;
     };
 
-fetch();
+      fetch();
     
     async function fetch() {
   
@@ -45,14 +45,14 @@ fetch();
         Notiflix.Notify.failure('Sorry. There are no images ... 😭');
       }
 
-      if (page === Math.ceil(imgData.totalHits / 12)) {
+      if (page === Math.ceil(imgData.totalHits / 20)) {
         Notiflix.Notify.info(
           "We're sorry, but you've reached the end of search results."
         );
       }
 
       setImagesData(prevState => [...prevState, ...normImageData]);
-      setShowBtnLoadMore(page < Math.ceil(imgData.totalHits / 12));
+      setShowBtnLoadMore(page < Math.ceil(imgData.totalHits / 20));
       setShowLoader(false);
     }
  

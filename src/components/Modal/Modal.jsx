@@ -4,12 +4,14 @@ import PropTypes from 'prop-types';
 
 export function Modal (props) {
 
+  
 
   useEffect(() => {
+    document.body.classList.add('modal-open');
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-
+        document.body.classList.remove('modal-open');
       window.removeEventListener('keydown', handleKeyDown);
     }
   })

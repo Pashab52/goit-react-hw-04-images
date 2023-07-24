@@ -13,7 +13,7 @@ async function fetchImg(searchValue, page) {
         q: searchValue,
         image_type: 'photo',
         orientation: 'horizontal',
-        per_page: 12,
+        per_page: 20,
         page: page,
       },
     });
